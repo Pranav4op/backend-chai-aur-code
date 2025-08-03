@@ -21,6 +21,11 @@ const generateAccessTokenAndRefreshToken = async (userId) => {
   }
 };
 
+const options = {
+  httpOnly: true,
+  secure: true,
+};
+
 const registerUser = asyncHandler(async (req, res) => {
   // console.log("Register Router hit");
   const { fullName, username, email, password } = req.body;
@@ -107,10 +112,6 @@ const loginUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
   //used for security
-  const options = {
-    httpOnly: true, //this step allows only server to modify the cookie
-    secure: true,
-  };
   return res
     .status(200)
     .cookie("accessToken", userAccessToken, options)
@@ -135,10 +136,7 @@ const logoutUser = async (req, res) => {
       new: true,
     }
   );
-  const options = {
-    httpOnly: true, //this step allows only server to modify the cookie
-    secure: true,
-  };
+
   return res
     .status(200)
     .clearCookie("accessToken", options)
@@ -164,10 +162,6 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     if (incomingRefreshToken !== user?.refreshToken) {
       throw new ApiErrors(401, "Refresh token is expired or used");
     }
-    const options = {
-      httpOnly: true,
-      secure: true,
-    };
 
     const { accessToken, newRefreshToken } =
       await generateAccessTokenAndRefreshToken(user._id);
