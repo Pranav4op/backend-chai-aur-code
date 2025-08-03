@@ -19,11 +19,12 @@ app.use(express.urlencoded({ extended: true, limit: "20kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
-import userRouter from "./routes/user.routes.js";
+import Router from "./routes/user.routes.js";
 
-app.use("/api/v1/users", userRouter);
+app.use("/api/v1/users", Router);
 app.get("/test", (req, res) => {
   res.send("Server is working!");
+  console.log("Hello");
 });
 
 export { app };
