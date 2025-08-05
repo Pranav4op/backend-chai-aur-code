@@ -46,7 +46,6 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiErrors(409, "User already exists");
   }
 
-  // const avatarLocalPath = req.files?.avatar[0]?.path;
   let coverImageLocalPath;
   if (
     req.files &&
@@ -66,9 +65,6 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const avatar = await uploadOnCloudinary(avatarLocalPath);
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
-  // if (!avatar) {
-  //   throw new ApiErrors(400, "Avatar Image is mandatory");
-  // }
 
   const user = await User.create({
     fullName,
@@ -129,8 +125,8 @@ const logoutUser = async (req, res) => {
   await User.findByIdAndUpdate(
     req.user._id,
     {
-      $set: {
-        refreshToken: undefined,
+      $unset: {
+        refreshToken: 1,
       },
     },
     {
