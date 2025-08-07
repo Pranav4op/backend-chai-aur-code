@@ -75,6 +75,26 @@ const updateComment = asyncHandler(async (req, res) => {
 
 const deleteComment = asyncHandler(async (req, res) => {
   // TODO: delete a comment
+  const { commentId } = req.params;
+  if (!commentId) {
+    throw new ApiErrors(400, "Comment not found");
+  }
+  commentExist = await Comment.findById(commentId);
+  if (!commentExist) {
+    throw new ApiErrors(400, "No such comment exist");
+  }
+  if (Comment.owner.toString() !== req.user._id) {
+    throw new ApiErrors(400, "Delete only your comment");
+  }
+  const deletedComment = await Comment.findByIdAndDelete(commentId);
+
+  if (!deletedComment) {
+    throw new ApiErrors(500, "Unable to delete comment, Something went wrong");
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, deletedComment, "Comment deleted successfully"));
 });
 
 export { getVideoComments, addComment, updateComment, deleteComment };
