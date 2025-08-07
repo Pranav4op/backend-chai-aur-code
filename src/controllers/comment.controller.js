@@ -5,6 +5,12 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Video } from "../models/video.model.js";
 
+const checkUser = () => {
+  if (Comment.owner.toString() !== req.user._id.toString()) {
+    throw new ApiErrors(400, "Different User comment selected");
+  }
+};
+
 const getVideoComments = asyncHandler(async (req, res) => {
   //TODO: get all comments for a video
   const { videoId } = req.params;
@@ -56,6 +62,9 @@ const updateComment = asyncHandler(async (req, res) => {
   if (!comment) {
     throw new ApiErrors(400, "Comment not found");
   }
+
+  checkUser();
+
   const updatedComment = await Comment.findByIdAndUpdate(
     commentId,
     {
@@ -83,16 +92,15 @@ const deleteComment = asyncHandler(async (req, res) => {
   if (!commentExist) {
     throw new ApiErrors(400, "No such comment exist");
   }
-  if (Comment.owner.toString() !== req.user._id) {
-    throw new ApiErrors(400, "Delete only your comment");
-  }
+  checkUser();
+
   const deletedComment = await Comment.findByIdAndDelete(commentId);
 
   if (!deletedComment) {
     throw new ApiErrors(500, "Unable to delete comment, Something went wrong");
   }
 
-  res
+  return res
     .status(200)
     .json(new ApiResponse(200, deletedComment, "Comment deleted successfully"));
 });
